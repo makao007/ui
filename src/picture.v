@@ -181,6 +181,20 @@ pub fn (mut pic Picture) propose_size(w int, h int) (int, int) {
 	return pic.width, pic.height
 }
 
+pub fn (mut pic Picture) set_path (path string, width int, height int) {
+	pic.path = path
+	if img := pic.ui.gg.create_image(path) {
+		pic.image = img
+		if width == 0 && height ==0 {
+			// pass
+		} else if width == 0 && img.height != 0{
+			pic.width = (img.width * height / img.height)
+		} else if height == 0 && img.width != 0{
+			pic.height = (img.height * width / img.width)
+		}
+	}
+}
+
 fn (mut pic Picture) draw() {
 	pic.draw_device(mut pic.ui.dd)
 }
@@ -197,6 +211,8 @@ fn (mut pic Picture) draw_device(mut d DrawDevice) {
 fn (mut pic Picture) set_visible(state bool) {
 	pic.hidden = !state
 }
+
+
 
 fn (pic &Picture) point_inside(x f64, y f64) bool {
 	return point_inside(pic, x, y)

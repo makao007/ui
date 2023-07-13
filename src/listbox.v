@@ -34,10 +34,12 @@ pub mut:
 	hovering      int = -1
 	draw_count    int
 	on_change     ListBoxFn = ListBoxFn(0)
+	on_dropped    ListBoxFn = ListBoxFn(0)
 	is_focused    bool
 	item_height   int = ui.listbox_item_height
 	text_offset_y int = ui.listbox_text_offset_y
 	id            string
+	placeholder   string
 	// TODO
 	draw_lines     bool
 	color_disabled gx.Color = ui.listbox_color_disabled
@@ -79,9 +81,11 @@ mut:
 	height        int
 	z_index       int
 	on_change     ListBoxFn = ListBoxFn(0)
+	on_dropped    ListBoxFn = ListBoxFn(0)
 	item_height   int       = ui.listbox_item_height
 	text_offset_y int       = ui.listbox_text_offset_y
 	id            string // To use one callback for multiple ListBoxes
+	placeholder   string    = 'drop file here'
 	// TODO
 	draw_lines bool // Draw a rectangle around every item?
 	theme      string = no_style
@@ -110,6 +114,7 @@ pub fn listbox(c ListBoxParams) &ListBox {
 		selectable: c.selectable
 		multi: c.multi
 		on_change: c.on_change
+		on_dropped: c.on_dropped
 		draw_lines: c.draw_lines
 		// bg_color: c.bg_color
 		// color_pressed: c.color_pressed
@@ -122,6 +127,7 @@ pub fn listbox(c ListBoxParams) &ListBox {
 		ordered: c.ordered
 		id: c.id
 		ui: 0
+		placeholder: c.placeholder
 	}
 	list.style_params.style = c.theme
 	for id, text in c.items {
@@ -167,6 +173,7 @@ fn (mut lb ListBox) init(parent Layout) {
 	// println("lb $lb.files_droped")
 	if lb.files_droped {
 		subscriber.subscribe_method(events.on_files_droped, on_files_droped, lb)
+		subscriber.subscribe_method(events.on_files_droped, on_dropped, lb)
 		// lb.ui.window.evt_mngr.add_receiver(lb, [events.on_files_droped])
 	}
 }
@@ -540,7 +547,7 @@ fn (mut lb ListBox) draw_device(mut d DrawDevice) {
 		dtw = DrawTextWidget(lb)
 		dtw.draw_device_styled_text(d, lb.x + ui.listbox_text_offset_x, lb.y + lb.text_offset_y,
 			if lb.files_droped {
-			'Empty listbox. Drop files here ...'
+				lb.placeholder
 		} else {
 			''
 		}, color: gx.gray)
@@ -635,6 +642,16 @@ fn on_change(mut lb ListBox, e &MouseEvent, window &Window) {
 pub fn (lb &ListBox) call_on_change() {
 	if lb.on_change != ListBoxFn(0) {
 		lb.on_change(lb)
+	}
+}
+
+fn on_dropped(mut lb ListBox, e &MouseEvent, window &Window) {
+	lb.call_on_dropped()
+}
+
+pub fn (lb &ListBox) call_on_dropped() {
+	if lb.on_dropped != ListBoxFn(0) {
+		lb.on_dropped(lb)
 	}
 }
 

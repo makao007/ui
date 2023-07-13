@@ -34,6 +34,8 @@ pub mut:
 	clipping bool
 	// component state for composable widget
 	component voidptr
+	margin_x  int
+	margin_y  int
 }
 
 [params]
@@ -48,6 +50,8 @@ pub struct LabelParams {
 	text     string
 	// text_size f64
 	theme string = no_style
+	margin_x int = 0
+	margin_y int = 0
 }
 
 pub fn label(c LabelParams) &Label {
@@ -62,6 +66,8 @@ pub fn label(c LabelParams) &Label {
 		// text_size: c.text_size
 		justify: c.justify
 		style_params: c.LabelStyleParams
+		margin_x: c.margin_x
+		margin_y: c.margin_y
 	}
 	lbl.style_params.style = c.theme
 	return lbl
@@ -176,7 +182,7 @@ fn (mut l Label) draw_device(mut d DrawDevice) {
 	mut dtw := DrawTextWidget(l)
 	dtw.draw_device_load_style(d)
 	for i, split in splits {
-		dtw.draw_device_text(d, adj_pos_x, adj_pos_y + (height * i), split)
+		dtw.draw_device_text(d, adj_pos_x + l.margin_x, adj_pos_y + ((height+l.margin_y) * i), split)
 		$if tbb ? {
 			w, h := l.ui.dd.text_size(split)
 			println('label: w, h := l.ui.dd.text_size(split)')
@@ -199,4 +205,28 @@ pub fn (l &Label) point_inside(x f64, y f64) bool {
 
 pub fn (mut l Label) set_text(s string) {
 	l.text = s
+}
+
+pub fn (mut l Label) set_text_auto_wrap(s string, width int) {
+	splits := s.split('\n')
+	mut temp := []string{}
+	for split in splits {
+		w, _ := l.ui.dd.text_size(split)
+		if w <= width {
+			temp << split
+		} else {
+			mut tmp := ''
+			for c in split.split('') {
+				w2, _ := l.ui.dd.text_size(tmp + c)
+				if w2 < width {
+					tmp += c
+				} else {
+					temp << tmp
+					tmp = c
+				}
+			}
+			temp << tmp
+		}
+	}
+	l.text = temp.join('\n')
 }
