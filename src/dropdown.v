@@ -33,6 +33,7 @@ pub mut:
 	style_params DropdownStyleParams
 	// text styles
 	text_styles TextStyles
+	text_size   int
 	// text_size   f64
 	// component state for composable widget
 	component voidptr
@@ -49,6 +50,7 @@ pub struct DropdownParams {
 	height         int = 25
 	z_index        int = 10
 	selected_index int = -1
+	text_size      int = 20
 	// text_size            f64
 	theme                string = no_style
 	on_selection_changed DropDownFn
@@ -72,6 +74,7 @@ pub fn dropdown(c DropdownParams) &Dropdown {
 		on_selection_changed: c.on_selection_changed
 		style_params: c.DropdownStyleParams
 		def_text: c.def_text
+		text_size: c.text_size
 		ui: 0
 	}
 	dd.style_params.style = c.theme
@@ -168,6 +171,7 @@ pub fn (mut dd Dropdown) draw_device(mut d DrawDevice) {
 	}
 	mut dtw := DrawTextWidget(dd)
 	dtw.draw_device_load_style(d)
+	dtw.update_text_size(dd.text_size)
 	// draw the main dropdown
 	d.draw_rect_filled(dd.x, dd.y, dd.width, dd.dropdown_height, dd.style.bg_color)
 	d.draw_rect_empty(dd.x, dd.y, dd.width, dd.dropdown_height, if dd.is_focused {
@@ -177,10 +181,10 @@ pub fn (mut dd Dropdown) draw_device(mut d DrawDevice) {
 	})
 	if dd.selected_index >= 0 {
 		// dd.ui.dd.draw_text_def(dd.x + 5, dd.y + 5, dd.items[dd.selected_index].text)
-		dtw.draw_device_text(d, dd.x + 5, dd.y + 5, dd.items[dd.selected_index].text)
+		dtw.draw_device_text(d, dd.x + 5, dd.y + 5 + (dd.dropdown_height-dd.text_size)/2-3, dd.items[dd.selected_index].text)
 	} else {
 		// dd.ui.dd.draw_text_def(dd.x + 5, dd.y + 5, dd.def_text)
-		dtw.draw_device_text(d, dd.x + 5, dd.y + 5, dd.def_text)
+		dtw.draw_device_text(d, dd.x + 5, dd.y + 5 + (dd.dropdown_height-dd.text_size)/2-3, dd.def_text)
 	}
 	dd.draw_device_open(d)
 	// draw the arrow
@@ -195,6 +199,7 @@ fn (dd &Dropdown) draw_device_open(d DrawDevice) {
 			dd.style.drawer_color)
 		d.draw_rect_empty(dd.x, dd.y + dd.dropdown_height, dd.width, dd.items.len * dd.dropdown_height,
 			dd.style.border_color)
+
 		y := dd.y + dd.dropdown_height
 		for i, item in dd.items {
 			color := if i == dd.hover_index { dd.style.border_color } else { dd.style.drawer_color }
@@ -203,7 +208,7 @@ fn (dd &Dropdown) draw_device_open(d DrawDevice) {
 			d.draw_rect_empty(dd.x, y + i * dd.dropdown_height, dd.width, dd.dropdown_height,
 				dd.style.border_color)
 			// dd.ui.dd.draw_text_def(dd.x + 5, y + i * dd.dropdown_height + 5, item.text)
-			DrawTextWidget(dd).draw_device_text(d, dd.x + 5, y + i * dd.dropdown_height + 5,
+			DrawTextWidget(dd).draw_device_text(d, dd.x + 5, y + i * dd.dropdown_height + 5 + (dd.dropdown_height-dd.text_size)/2-3,
 				item.text)
 		}
 	}

@@ -208,7 +208,8 @@ pub fn open_url(url string) {
 		return
 	}
 	$if windows {
-		os.execute('start "${url}"')
+		println('explorer ${url}')
+		os.execute('explorer "${url}"')
 	}
 	$if macos {
 		os.execute('open "${url}"')

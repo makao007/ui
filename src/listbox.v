@@ -128,6 +128,7 @@ pub fn listbox(c ListBoxParams) &ListBox {
 		id: c.id
 		ui: 0
 		placeholder: c.placeholder
+		has_scrollview: c.scrollview
 	}
 	list.style_params.style = c.theme
 	for id, text in c.items {
@@ -545,6 +546,7 @@ fn (mut lb ListBox) draw_device(mut d DrawDevice) {
 	from, to := lb.visible_items()
 	if lb.items.len == 0 {
 		dtw = DrawTextWidget(lb)
+		dtw.update_text_size(lb.text_size)
 		dtw.draw_device_styled_text(d, lb.x + ui.listbox_text_offset_x, lb.y + lb.text_offset_y,
 			if lb.files_droped {
 				lb.placeholder

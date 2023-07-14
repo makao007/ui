@@ -50,8 +50,8 @@ pub struct LabelParams {
 	text     string
 	// text_size f64
 	theme string = no_style
-	margin_x int = 0
-	margin_y int = 0
+	margin_x int
+	margin_y int
 }
 
 pub fn label(c LabelParams) &Label {

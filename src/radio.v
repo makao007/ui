@@ -74,12 +74,14 @@ pub struct RadioParams {
 	horizontal bool
 	compact    bool
 	theme      string = no_style
+	offset_x   int
+	offset_y   int
 }
 
 pub fn radio(c RadioParams) &Radio {
 	mut r := &Radio{
 		id: c.id
-		height: 20
+		height: 25
 		z_index: c.z_index
 		values: c.values
 		title: c.title
@@ -89,6 +91,8 @@ pub fn radio(c RadioParams) &Radio {
 		compact: c.compact
 		ui: 0
 		on_click: c.on_click
+		offset_x: c.offset_x
+		offset_y: c.offset_y
 	}
 	r.style_params.style = c.theme
 	r.update_size()
@@ -263,7 +267,7 @@ pub fn (mut r Radio) set_size_from_values() {
 		width := dtw.text_width(value)
 		if r.horizontal {
 			if r.compact {
-				w := width + check_mark_size + 10
+				w := int(f32(width)*1.5) + check_mark_size + 15
 				r.widths << w
 				r.adj_width += w
 			}
@@ -329,8 +333,8 @@ fn (mut r Radio) draw_device(mut d DrawDevice) {
 				y += r.height
 			}
 		}
-		d.draw_circle_filled(x + 8, y + 8, 7, r.style.bg_color)
-		d.draw_image(x, y - 1, 16, 16, if i == r.selected_index {
+		d.draw_circle_filled(x + 8, y + 8 + r.offset_y, 7, r.style.bg_color)
+		d.draw_image(x, y - 1 + r.offset_y, 16, 16, if i == r.selected_index {
 			r.ui.radio_selected_image
 		} else {
 			r.ui.radio_image
