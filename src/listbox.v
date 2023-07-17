@@ -979,7 +979,8 @@ fn (item &ListItem) free() {
 }
 
 fn (li &ListItem) text() string {
-	return li.text[0..li.draw_to]
+	return li.text       // bug:why?
+	//return li.text[0..li.draw_to]
 }
 
 fn (li &ListItem) point_inside(x f64, y f64) bool {

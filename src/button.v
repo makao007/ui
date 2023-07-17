@@ -111,6 +111,8 @@ pub struct ButtonParams {
 	padding        f64
 	// text_size    f64
 	theme string = no_style
+	hidden       bool
+	disabled     bool
 }
 
 pub fn button(c ButtonParams) &Button {
@@ -137,6 +139,8 @@ pub fn button(c ButtonParams) &Button {
 		// radius: f32(c.radius)
 		padding: f32(c.padding)
 		ui: 0
+		hidden: c.hidden
+		disabled: c.disabled
 	}
 	b.style_params.style = c.theme
 	if b.use_icon && !os.exists(c.icon_path) {

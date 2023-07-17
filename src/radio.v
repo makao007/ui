@@ -296,7 +296,7 @@ pub fn (mut r Radio) update_size() {
 	}
 }
 
-fn (mut r Radio) draw() {
+pub fn (mut r Radio) draw() {
 	r.draw_device(mut r.ui.dd)
 }
 
